@@ -1,0 +1,46 @@
+name: dutybell
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile || npm ci
+      - run: npm run verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dutybell-bundle
+          path: dist/tools/dutybell.js
+
+  smoke:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run build
+      - name: smoke the fail-closed behavior
+        run: |
+          set -e
+          DB="node dist/tools/dutybell.js"
+          D=$(mktemp -d) && cd "$D"
+          # empty registry ticks as drift
+          $DB init
+          $DB tick; test $? -eq 2
+          # healthy duty ticks ok
+          $DB add good '* * * * *' /bin/true --shell --catchup 60000
+          $DB tick; test $? -eq 0
+          # failing duty rings the bell
+          $DB add bad '* * * * *' /bin/false --shell --catchup 60000
+          $DB tick; test $? -eq 2
+          rm -rf "$D"

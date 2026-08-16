@@ -1,0 +1,11 @@
+dutybell
+Copyright (c) 2026 Raed Al-Msodeh
+
+This product includes software developed as part of THE FORGE —
+a series of independent, fail-closed, offline-first open-source
+proof-of-concept projects.
+
+dutybell is licensed under the MIT License; see LICENSE.
+Build-time development dependencies (TypeScript, Vitest, esbuild,
+@types/node) are covered by their own licenses and are not shipped
+in the distributed artifact (`dist/`).
