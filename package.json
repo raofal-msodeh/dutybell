@@ -10,7 +10,7 @@
     "check": "tsc --noEmit",
     "test": "vitest run",
     "build": "node build.mjs",
-    "verify": "npm run check && npm test && npm run build"
+    "verify": "npm run check && npm run build && npm test"
   },
   "files": [
     "dist"
